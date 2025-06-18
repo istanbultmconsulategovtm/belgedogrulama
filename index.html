@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Belge Doğrulama Sistemi - Firestore</title>
+    <title>Türkmenistan Başkonsolosluğu Doğrulama Sistemi</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -170,7 +170,7 @@
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="javascript:void(0)" onclick="showHome()">
                 <i class="fas fa-file-contract me-2"></i>
-                <span class="fw-bold">BELGE DOĞRULAMA (FS)</span>
+                <span class="fw-bold">TÜRKMENİSTAN BAŞKONSOLOSLUĞU DOĞRULAMA SİSTEMİ</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -197,7 +197,7 @@
     <!-- Hero Section -->
     <section class="hero-section" id="home-section">
         <div class="container text-center">
-            <h1 class="display-5 fw-bold mb-3">Belge Doğrulama Sistemi</h1>
+            <h1 class="display-5 fw-bold mb-3">Türkmenistan Başkonsolosluğu Doğrulama Sistemi</h1>
             <p class="lead mb-4">Belgelerinizi kolay, hızlı ve güvenli bir şekilde doğrulayın</p>
             <div class="d-flex justify-content-center gap-3">
                 <button class="btn btn-light btn-lg px-4 py-2 fw-bold" onclick="showVerification()">
@@ -441,7 +441,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <h5 class="fw-bold mb-2">BELGE DOĞRULAMA (FS)</h5>
+                    <h5 class="fw-bold mb-2">TÜRKMENİSTAN BAŞKONSOLOSLUĞU DOĞRULAMA SİSTEMİ</h5>
                     <p class="small">Güvenilir belge doğrulama çözümleri.</p>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -465,7 +465,7 @@
             </div>
             <hr class="bg-light my-2">
             <div class="text-center pt-2">
-                <p class="mb-0 small">© 2023-2025 Belge Doğrulama Sistemi (FS). Tüm hakları saklıdır. <span id="user-id-footer" class="ms-2"></span></p>
+                <p class="mb-0 small">© 2023-2025 Türkmenistan Başkonsolosluğu Doğrulama Sistemi. Tüm hakları saklıdır. <span id="user-id-footer" class="ms-2"></span></p>
             </div>
         </div>
     </footer>
@@ -528,16 +528,28 @@
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Firebase projenizin yapılandırma bilgileri
-        // GERÇEK PROJENİZİN BİLGİLERİYLE DEĞİŞTİRİN!
-        const firebaseConfigFromGlobal = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
-        const firebaseConfig = firebaseConfigFromGlobal ? JSON.parse(firebaseConfigFromGlobal) : {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+        let firebaseConfig;
+        let initialAuthToken;
+
+        // Canvas ortamı değişkenlerinin tanımlı olup olmadığını kontrol edin
+        if (typeof __firebase_config !== 'undefined' && typeof __initial_auth_token !== 'undefined') {
+            console.log("Canvas ortamı Firebase yapılandırması kullanılıyor.");
+            firebaseConfig = JSON.parse(__firebase_config);
+            initialAuthToken = __initial_auth_token;
+        } else {
+            console.log("Yerel ortam için Firebase yapılandırması kullanılıyor.");
+            // Kullanıcının sağladığı Firebase yapılandırmasını varsayılan olarak kullanın
+            firebaseConfig = {
+                apiKey: "AIzaSyAzBBgPme5oA1xWBp3o8c0kk_65TcWBDEk",
+                authDomain: "turkmenistan-consulate.firebaseapp.com",
+                projectId: "turkmenistan-consulate",
+                storageBucket: "turkmenistan-consulate.firebasestorage.app",
+                messagingSenderId: "257518915632",
+                appId: "1:257518915632:web:0a069b8a563428336e9df5",
+                measurementId: "G-4VEHZYBFF2"
+            };
+            initialAuthToken = null; // Yerel ortamda özel token yok
+        }
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
@@ -622,21 +634,33 @@
                     }
 
                 } else {
-                    console.log("Kullanıcı çıkış yaptı veya anonim oturum açılamadı.");
+                    console.log("Kullanıcı çıkış yaptı veya oturum açılamadı.");
                     currentUserId = null;
                     document.getElementById('user-id-display').classList.add('d-none');
-                     // Anonim olarak giriş yapmayı dene
                     try {
-                        const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                        if (initialToken) {
-                            console.log("Özel token ile giriş yapılıyor...");
-                            await signInWithCustomToken(auth, initialToken);
+                        // Belirlenen initialAuthToken'ı kullanın
+                        if (initialAuthToken) { 
+                            try {
+                                console.log("Özel token ile giriş yapılıyor...");
+                                await signInWithCustomToken(auth, initialAuthToken);
+                            } catch (customTokenError) {
+                                console.error("Özel token ile giriş hatası:", customTokenError);
+                                // Özel token hatası (uyumsuzluk veya geçersiz token) durumunda
+                                // anonim girişe geri dön
+                                if (customTokenError.code === 'auth/custom-token-mismatch' || customTokenError.code === 'auth/invalid-custom-token') {
+                                    console.log("Özel token hatası nedeniyle anonim olarak giriş yapılıyor...");
+                                    await signInAnonymously(auth);
+                                } else {
+                                    // Diğer hataları genel işleme için yeniden fırlatın
+                                    throw customTokenError;
+                                }
+                            }
                         } else {
                             console.log("Anonim olarak giriş yapılıyor...");
                             await signInAnonymously(auth);
                         }
                     } catch (error) {
-                        console.error("Anonim giriş hatası:", error);
+                        console.error("Kimlik doğrulama sırasında genel hata:", error);
                         showModal(`Kimlik doğrulama hatası: ${error.message}`, 'error');
                     }
                 }
@@ -796,7 +820,7 @@
                             <h4 class="text-warning fw-bold">BELGE GEÇERSİZ</h4>
                             <p><strong>Belge No:</strong> ${docData.belgeNo}</p>
                             <p><strong>Tarih:</strong> ${docData.belgeTarihi}</p>
-                            <p class="mt-2">Bu belge sistemimizde kayıtlı ancak <strong>geçerli değil</strong>.</p>`;
+                            <p class="mt-2">Bu belge sistemimizde kayıtlı ancak <strong>geçerli değil</strong>.`
                     }
                 } else {
                     resultContainer.classList.add('error-result');
