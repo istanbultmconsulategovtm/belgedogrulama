@@ -3,141 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Belge Doğrulama Sistemi - Firestore</title>
+    <title>Türkmenistan Başkonsolosluğu Belge Doğrulama</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS (XLSX) for Excel parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary: #1a73e8;
-            --secondary: #4285f4;
             --success: #34a853;
             --danger: #ea4335;
-            --warning: #fbbc05;
             --dark-text: #202124;
         }
-        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f2f5;
             color: var(--dark-text);
-            padding-top: 70px; /* Navbar yüksekliği kadar padding */
         }
-        
-        .card {
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-            border: none;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            border-color: var(--primary);
-            padding: 10px 20px;
-            font-weight: 600;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--secondary);
-            border-color: var(--secondary);
-        }
-        
-        .navbar {
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-        }
-        
-        .hero-section {
+        .header {
             background: linear-gradient(135deg, #1a73e8, #4285f4);
             color: white;
-            border-radius: 0 0 30px 30px;
-            padding: 60px 0; /* Reduced padding */
-            margin-bottom: 30px; /* Reduced margin */
+            padding: 2rem 1rem;
+            text-align: center;
         }
-        
-        .feature-icon {
-            width: 60px; /* Reduced size */
-            height: 60px; /* Reduced size */
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px; /* Reduced margin */
-            color: white;
-            font-size: 24px; /* Reduced size */
-        }
-        
-        .form-container, .login-container, .admin-panel {
+        .form-container {
             background-color: white;
             border-radius: 15px;
-            padding: 25px; /* Reduced padding */
+            padding: 30px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-top: -50px;
+            position: relative;
+            z-index: 10;
         }
-        
         .result-card {
-            min-height: 180px; /* Reduced height */
+            min-height: 180px;
             display: flex;
-            flex-direction: column; /* Dikey hizalama için */
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            font-size: 16px; /* Reduced font size */
+            font-size: 1rem;
             border-radius: 8px;
+            padding: 20px;
         }
-        
         .success-result {
             background-color: rgba(52, 168, 83, 0.1);
-            border-left: 4px solid var(--success);
+            border-left: 5px solid var(--success);
         }
-        
         .error-result {
             background-color: rgba(234, 67, 53, 0.1);
-            border-left: 4px solid var(--danger);
-        }
-        
-        footer {
-            background: linear-gradient(135deg, #1a73e8, #4285f4);
-            color: white;
-            padding: 25px 0; /* Reduced padding */
-            margin-top: 40px; /* Reduced margin */
-        }
-
-        /* Custom Modal Styles */
-        .modal-backdrop.show {
-            opacity: 0.5;
-        }
-        .modal-content {
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .modal-header {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-        .modal-header .btn-close {
-            position: absolute;
-            right: 15px;
-            top: 15px;
-        }
-        .modal-title {
-            font-weight: 600;
-        }
-        .modal-body {
-            padding-top: 10px;
-            font-size: 1rem;
-        }
-        .modal-footer {
-            border-top: none;
-            padding-top: 0;
+            border-left: 5px solid var(--danger);
         }
         .spinner-container {
             display: none;
@@ -146,632 +61,139 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.7);
+            background-color: rgba(255, 255, 255, 0.8);
             z-index: 9999;
             justify-content: center;
             align-items: center;
         }
-        .user-id-display {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            background-color: rgba(0,0,0,0.7);
+        footer {
+            background-color: #343a40;
             color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 0.8em;
-            z-index: 1000;
+            padding: 20px 0;
+            margin-top: 40px;
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+
+    <header class="header">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="javascript:void(0)" onclick="showHome()">
-                <i class="fas fa-file-contract me-2"></i>
-                <span class="fw-bold">BELGE DOĞRULAMA (FS)</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="javascript:void(0)" onclick="showHome()">Ana Sayfa</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="javascript:void(0)" onclick="showVerification()">Belge Doğrula</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="javascript:void(0)" onclick="showAdminLogin()">Yönetici Girişi</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="javascript:void(0)" onclick="showContact()">İletişim</a>
-                    </li>
-                </ul>
-            </div>
+            <h1 class="display-5 fw-bold"><i class="fas fa-file-contract me-2"></i> Belge Doğrulama Sistemi</h1>
+            <p class="lead">Türkmenistan Başkonsolosluğu tarafından verilen belgelerin geçerliliğini sorgulayın.</p>
         </div>
-    </nav>
+    </header>
 
-    <!-- Hero Section -->
-    <section class="hero-section" id="home-section">
-        <div class="container text-center">
-            <h1 class="display-5 fw-bold mb-3">Belge Doğrulama Sistemi</h1>
-            <p class="lead mb-4">Belgelerinizi kolay, hızlı ve güvenli bir şekilde doğrulayın</p>
-            <div class="d-flex justify-content-center gap-3">
-                <button class="btn btn-light btn-lg px-4 py-2 fw-bold" onclick="showVerification()">
-                    <i class="fas fa-check-circle me-2"></i>Belge Doğrula
-                </button>
-                <button class="btn btn-outline-light btn-lg px-4 py-2" onclick="showAdminLogin()">
-                    <i class="fas fa-user-shield me-2"></i>Yönetici Girişi
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="container mb-4" id="features-section">
-        <div class="row text-center mb-3">
-            <div class="col-md-8 mx-auto">
-                <h2 class="fw-bold mb-2">Neden Bizim Sistemimizi Kullanmalısınız?</h2>
-                <p class="lead text-muted">Belgelerinizin güvenliğini ve geçerliliğini sağlamak için tasarlanmış kapsamlı çözüm</p>
-            </div>
-        </div>
-        <div class="row g-3">
-            <div class="col-md-4">
-                <div class="card h-100 p-3 text-center">
-                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
-                    <h3 class="h5 fw-bold">Güvenli Doğrulama</h3>
-                    <p class="text-muted small">Gelişmiş güvenlik protokolleri ile belgeleriniz tam koruma altında.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100 p-3 text-center">
-                    <div class="feature-icon"><i class="fas fa-bolt"></i></div>
-                    <h3 class="h5 fw-bold">Hızlı Sonuç</h3>
-                    <p class="text-muted small">Saniyeler içinde belgelerinizin geçerliliğini doğrulayın.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100 p-3 text-center">
-                    <div class="feature-icon"><i class="fas fa-database"></i></div>
-                    <h3 class="h5 fw-bold">Bulut Veritabanı</h3>
-                    <p class="text-muted small">Firestore ile güvenilir ve ölçeklenebilir veri saklama.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Verification Section -->
-    <section class="container mb-4 d-none" id="verification-section">
+    <main class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="form-container">
-                    <h2 class="text-center mb-3 fw-bold">Belge Doğrulama</h2>
-                    <p class="text-center text-muted mb-3">Belge bilgilerinizi aşağıdaki formu doldurarak doğrulayabilirsiniz</p>
+                    <h2 class="text-center mb-3 fw-bold">Belge Sorgulama</h2>
+                    <p class="text-center text-muted mb-4">Lütfen doğrulamak istediğiniz belgenin bilgilerini giriniz.</p>
                     <form id="verification-form">
                         <div class="mb-3">
                             <label for="document-number" class="form-label fw-bold">Belge Numarası</label>
-                            <input type="text" class="form-control form-control-lg" id="document-number" placeholder="Belge numaranızı girin" required>
+                            <input type="text" class="form-control form-control-lg" id="document-number" placeholder="Örn: 12345/2024" required>
                         </div>
                         <div class="mb-3">
                             <label for="document-date" class="form-label fw-bold">Belge Tarihi</label>
-                            <input type="text" class="form-control form-control-lg" id="document-date" placeholder="GG/AA/YYYY formatında girin" required>
+                            <input type="text" class="form-control form-control-lg" id="document-date" placeholder="GG/AA/YYYY" required>
                             <div class="form-text">Örnek: 15/07/2023</div>
                         </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-search me-2"></i>Belgeyi Doğrula
+                                <i class="fas fa-search me-2"></i>Sorgula
                             </button>
                         </div>
                     </form>
-                    <div class="result-card mt-4 p-3 d-none" id="result-container">
+                    <div class="result-card mt-4 d-none" id="result-container">
                         <div id="verification-result"></div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- Admin Login Section -->
-    <section class="container mb-4 d-none" id="admin-login-section">
-        <div class="row justify-content-center">
-            <div class="col-lg-6">
-                <div class="login-container">
-                    <h2 class="text-center mb-3 fw-bold">Yönetici Girişi</h2>
-                    <p class="text-center text-muted mb-3">Yönetici paneline erişmek için lütfen giriş yapın</p>
-                    <form id="admin-login-form">
-                        <div class="mb-3">
-                            <label for="admin-username" class="form-label fw-bold">Kullanıcı Adı</label>
-                            <input type="text" class="form-control form-control-lg" id="admin-username" placeholder="Kullanıcı adınızı girin" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="admin-password" class="form-label fw-bold">Parola</label>
-                            <input type="password" class="form-control form-control-lg" id="admin-password" placeholder="Parolanızı girin" required>
-                        </div>
-                        <div class="d-grid mb-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
-                            </button>
-                        </div>
-                        <div class="alert alert-danger d-none" id="login-error"></div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Admin Panel Section -->
-    <section class="container mb-4 d-none" id="admin-panel-section">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="fw-bold">Yönetici Paneli</h2>
-            <button class="btn btn-outline-primary" onclick="logoutAdmin()">
-                <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
-            </button>
-        </div>
-        <div class="admin-panel">
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-database display-4 text-primary mb-3"></i>
-                            <h3 class="card-title h5">Veritabanı Yönetimi</h3>
-                            <p class="card-text small">Kayıtları görüntüleyin ve yönetin.</p>
-                            <button class="btn btn-primary mt-2 btn-sm" onclick="showDatabaseTable()">Görüntüle</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-file-excel display-4 text-success mb-3"></i>
-                            <h3 class="card-title h5">Excel'den İçe Aktar</h3>
-                            <p class="card-text small">Toplu kayıt ekleyin.</p>
-                            <input type="file" id="excel-file-input" accept=".xlsx, .xls" style="display: none;">
-                            <button class="btn btn-success mt-2 btn-sm" onclick="document.getElementById('excel-file-input').click()">İçe Aktar</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-file-export display-4 text-info mb-3"></i>
-                            <h3 class="card-title h5">Verileri Dışa Aktar</h3>
-                            <p class="card-text small">Veritabanını CSV olarak indirin.</p>
-                            <button class="btn btn-info mt-2 btn-sm" onclick="exportDatabase()">Dışa Aktar</button>
-                        </div>
-                    </div>
-                </div>
-                 <div class="col-md-4 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-trash-alt display-4 text-danger mb-3"></i>
-                            <h3 class="card-title h5">Kayıt Sil</h3>
-                            <p class="card-text small">Belirli bir kaydı silin.</p>
-                            <button class="btn btn-danger mt-2 btn-sm" onclick="promptDeleteRecord()">Veri Sil</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-eraser display-4 text-warning mb-3"></i>
-                            <h3 class="card-title h5">Tüm Verileri Temizle</h3>
-                            <p class="card-text small text-danger"><strong>Dikkat:</strong> Tüm kayıtları siler.</p>
-                            <button class="btn btn-warning mt-2 btn-sm" onclick="clearAllData()">Temizle</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="mt-4 d-none" id="database-section">
-            <h3 class="fw-bold mb-3">Veritabanı Kayıtları</h3>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-primary">
-                        <tr>
-                            <th>Belge No</th>
-                            <th>Tarih</th>
-                            <th>Soyadı Adı</th>
-                            <th>Durum</th>
-                            <th>İşlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody id="database-table-body">
-                        <!-- Kayıtlar buraya yüklenecek -->
-                    </tbody>
-                </table>
-                 <p id="no-data-message" class="text-center text-muted mt-3 d-none">Gösterilecek kayıt bulunamadı.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="container mb-4 d-none" id="contact-section">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="form-container">
-                    <h2 class="text-center mb-3 fw-bold">İletişim</h2>
-                    <p class="text-center text-muted mb-3">Sorularınız veya destek talepleriniz için bize ulaşın</p>
-                    <div class="row mb-3">
-                        <div class="col-md-6 mb-2">
-                            <div class="card h-100">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
-                                    <h5 class="card-title h6">E-posta</h5>
-                                    <p class="card-text small">stambulconstm2@gmail.com</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <div class="card h-100">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-phone fa-2x text-success mb-2"></i>
-                                    <h5 class="card-title h6">Telefon</h5>
-                                    <p class="card-text small">+90 (212) 662 02 21/22/23</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <form id="contact-form">
-                        <div class="mb-2">
-                            <label class="form-label fw-bold">Adınız</label>
-                            <input type="text" class="form-control" placeholder="Adınızı girin" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label fw-bold">E-posta</label>
-                            <input type="email" class="form-control" placeholder="E-posta adresinizi girin" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label fw-bold">Mesajınız</label>
-                            <textarea class="form-control" rows="3" placeholder="Mesajınızı yazın" required></textarea>
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Gönder</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <h5 class="fw-bold mb-2">BELGE DOĞRULAMA (FS)</h5>
-                    <p class="small">Güvenilir belge doğrulama çözümleri.</p>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <h5 class="fw-bold mb-2">HIZLI LİNKLER</h5>
-                    <ul class="list-unstyled small">
-                        <li class="mb-1"><a href="javascript:void(0)" class="text-white text-decoration-none" onclick="showHome()">Ana Sayfa</a></li>
-                        <li class="mb-1"><a href="javascript:void(0)" class="text-white text-decoration-none" onclick="showVerification()">Belge Doğrula</a></li>
-                        <li class="mb-1"><a href="javascript:void(0)" class="text-white text-decoration-none" onclick="showContact()">İletişim</a></li>
-                        <li><a href="javascript:void(0)" class="text-white text-decoration-none" onclick="showAdminLogin()">Yönetici Girişi</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <h5 class="fw-bold mb-2">BİZİ TAKİP EDİN</h5>
-                    <div class="d-flex gap-3">
-                        <a href="#" class="text-white"><i class="fab fa-facebook fa-lg"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-twitter fa-lg"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-instagram fa-lg"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-linkedin fa-lg"></i></a>
-                    </div>
-                </div>
-            </div>
-            <hr class="bg-light my-2">
-            <div class="text-center pt-2">
-                <p class="mb-0 small">© 2023-2025 Belge Doğrulama Sistemi (FS). Tüm hakları saklıdır. <span id="user-id-footer" class="ms-2"></span></p>
-            </div>
-        </div>
+    </main>
+    
+    <footer class="text-center">
+        <p class="mb-0">&copy; 2024 Türkmenistan Başkonsolosluğu. Tüm hakları saklıdır.</p>
     </footer>
-    
-    <!-- User ID Display -->
-    <div id="user-id-display" class="user-id-display d-none">Mevcut Kullanıcı ID: <span id="current-user-id"></span></div>
 
-
-    <!-- Custom Modal -->
-    <div class="modal fade" id="customModal" tabindex="-1" aria-labelledby="customModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="customModalLabel">Bilgilendirme</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="customModalBody">
-                    <!-- Mesaj buraya gelecek -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="customModalCloseButton">Kapat</button>
-                    <button type="button" class="btn btn-primary d-none" id="customModalConfirmButton">Evet</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Spinner Container -->
+    <!-- Spinner -->
     <div class="spinner-container" id="spinner-container">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Yükleniyor...</span>
-        </div>
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Yükleniyor...</span></div>
     </div>
 
-
-    <!-- Bootstrap + Firebase SDKs + Custom JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script type="module">
-        // Firebase SDK'larını import et
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signInAnonymously, 
-            onAuthStateChanged,
-            signInWithCustomToken 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            getDocs, 
-            query, 
-            where, 
-            doc, 
-            deleteDoc,
-            writeBatch,
-            onSnapshot,
-            setLogLevel
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, query, where, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase projenizin yapılandırma bilgileri
-        // GERÇEK PROJENİZİN BİLGİLERİYLE DEĞİŞTİRİN!
-        const firebaseConfigFromGlobal = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
-        const firebaseConfig = firebaseConfigFromGlobal ? JSON.parse(firebaseConfigFromGlobal) : {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-
+        // --- Firebase Configuration ---
+        let firebaseConfig;
+        let initialAuthToken;
+        if (typeof __firebase_config !== 'undefined' && typeof __initial_auth_token !== 'undefined') {
+            firebaseConfig = JSON.parse(__firebase_config);
+            initialAuthToken = __initial_auth_token;
+        } else {
+            // Provide your own fallback config for local testing
+            firebaseConfig = {
+                apiKey: "AIzaSyAzBBgPme5oA1xWBp3o8c0kk_65TcWBDEk",
+                authDomain: "turkmenistan-consulate.firebaseapp.com",
+                projectId: "turkmenistan-consulate",
+                storageBucket: "turkmenistan-consulate.appspot.com",
+                messagingSenderId: "257518915632",
+                appId: "1:257518915632:web:0a069b8a563428336e9df5",
+                measurementId: "G-4VEHZYBFF2"
+            };
+            initialAuthToken = null;
+        }
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-        // Firebase uygulamasını başlat
+        // --- Firebase Initialization ---
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        setLogLevel('debug'); // Firestore loglarını görmek için
+        setLogLevel('debug');
 
-        let currentUserId = null;
-        let unsubscribeDocuments = null; // Firestore listener'ını saklamak için
-        
         const documentsCollectionPath = `/artifacts/${appId}/public/data/belgeler`;
         const documentsCollectionRef = collection(db, documentsCollectionPath);
 
-
-        // Custom Modal Fonksiyonları
-        let customModalInstance = null;
-        let confirmCallback = null;
-
-        function showModal(message, type = 'info', showConfirmButton = false, callback = null) {
-            const modalTitle = document.getElementById('customModalLabel');
-            const modalBody = document.getElementById('customModalBody');
-            const confirmBtn = document.getElementById('customModalConfirmButton');
-            const closeBtn = document.getElementById('customModalCloseButton');
-            
-            if (!customModalInstance) {
-                 customModalInstance = new bootstrap.Modal(document.getElementById('customModal'));
-            }
-
-            modalBody.innerHTML = message;
-            confirmCallback = callback;
-
-            switch(type) {
-                case 'success': modalTitle.textContent = 'Başarılı!'; modalTitle.className = 'modal-title text-success'; break;
-                case 'error': modalTitle.textContent = 'Hata!'; modalTitle.className = 'modal-title text-danger'; break;
-                case 'warning': modalTitle.textContent = 'Uyarı!'; modalTitle.className = 'modal-title text-warning'; break;
-                default: modalTitle.textContent = 'Bilgilendirme'; modalTitle.className = 'modal-title text-primary'; break;
-            }
-
-            if (showConfirmButton && typeof callback === 'function') {
-                confirmBtn.classList.remove('d-none');
-                closeBtn.textContent = 'İptal';
-            } else {
-                confirmBtn.classList.add('d-none');
-                closeBtn.textContent = 'Kapat';
-            }
-            customModalInstance.show();
-        }
+        // --- UI Helper ---
+        function showSpinner(show) { document.getElementById('spinner-container').style.display = show ? 'flex' : 'none'; }
         
-        document.getElementById('customModalConfirmButton').addEventListener('click', () => {
-            if (typeof confirmCallback === 'function') {
-                confirmCallback();
-            }
-            if(customModalInstance) customModalInstance.hide();
-        });
-
-        function showSpinner(show) {
-            const spinner = document.getElementById('spinner-container');
-            if (spinner) {
-                spinner.style.display = show ? 'flex' : 'none';
-            }
-        }
-
-
-        // Sayfa Yüklendiğinde
-        document.addEventListener('DOMContentLoaded', async () => {
-            showSpinner(true);
-            // Firebase Auth durumu değiştiğinde çalışır
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    console.log("Kullanıcı giriş yaptı (veya anonim oturum açıldı):", user.uid);
-                    currentUserId = user.uid;
-                    document.getElementById('current-user-id').textContent = currentUserId;
-                    document.getElementById('user-id-footer').textContent = `Kullanıcı ID: ${currentUserId}`;
-                    document.getElementById('user-id-display').classList.remove('d-none');
-
-                    // Admin panelinde ise ve veritabanı tablosu görünürse, yeniden yükle
-                    if (document.getElementById('admin-panel-section').classList.contains('d-none') === false && 
-                        document.getElementById('database-section').classList.contains('d-none') === false) {
-                        await loadDocumentsToTable(); 
-                    }
-
-                } else {
-                    console.log("Kullanıcı çıkış yaptı veya anonim oturum açılamadı.");
-                    currentUserId = null;
-                    document.getElementById('user-id-display').classList.add('d-none');
-                     // Anonim olarak giriş yapmayı dene
-                    try {
-                        const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                        if (initialToken) {
-                            console.log("Özel token ile giriş yapılıyor...");
-                            await signInWithCustomToken(auth, initialToken);
-                        } else {
-                            console.log("Anonim olarak giriş yapılıyor...");
-                            await signInAnonymously(auth);
-                        }
-                    } catch (error) {
-                        console.error("Anonim giriş hatası:", error);
-                        showModal(`Kimlik doğrulama hatası: ${error.message}`, 'error');
-                    }
+        // --- Authentication ---
+        onAuthStateChanged(auth, async (user) => {
+             if (!user) {
+                try {
+                    if (initialAuthToken) await signInWithCustomToken(auth, initialAuthToken);
+                    else await signInAnonymously(auth);
+                } catch (error) {
+                    console.error("Authentication Error:", error);
+                    alert(`Kimlik doğrulama başarısız oldu. Lütfen sayfayı yenileyin.`);
                 }
-                showSpinner(false);
-            });
-            
-            // Form event listener'ları
-            const verificationForm = document.getElementById('verification-form');
-            if (verificationForm) {
-                verificationForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    verifyDocument();
-                });
             }
-
-            const adminLoginForm = document.getElementById('admin-login-form');
-            if (adminLoginForm) {
-                adminLoginForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    loginAdmin();
-                });
-            }
-            
-            const excelFileInput = document.getElementById('excel-file-input');
-            if (excelFileInput) {
-                excelFileInput.addEventListener('change', handleExcelImport);
-            }
-
-            const contactForm = document.getElementById('contact-form');
-            if(contactForm){
-                contactForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    showModal('Mesajınız gönderildi (Bu bir demo özelliğidir).', 'success');
-                    contactForm.reset();
-                });
-            }
-
-            // İlk açılışta Ana Sayfa
-            showHome();
         });
 
-        // Global scope'a fonksiyonları ekle (onclick eventleri için)
-        window.showHome = showHome;
-        window.showVerification = showVerification;
-        window.showAdminLogin = showAdminLogin;
-        window.showAdminPanel = showAdminPanel;
-        window.showContact = showContact;
-        window.logoutAdmin = logoutAdmin;
-        window.showDatabaseTable = showDatabaseTable;
-        window.importFromExcel = () => document.getElementById('excel-file-input').click(); // Trigger file input
-        window.exportDatabase = exportDatabase;
-        window.promptDeleteRecord = promptDeleteRecord; // Değiştirildi
-        window.clearAllData = clearAllData;
-        window.deleteSingleRecord = deleteSingleRecord; // Tablodan silmek için
+        // --- Verification Logic ---
+        document.getElementById('verification-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            verifyDocument();
+        });
 
-        // Bölümleri gizleme/gösterme fonksiyonları
-        function hideAllSections() {
-            const sections = [
-                'home-section', 'features-section', 'verification-section',
-                'admin-login-section', 'admin-panel-section', 'contact-section'
-            ];
-            sections.forEach(id => {
-                const sec = document.getElementById(id);
-                if (sec) sec.classList.add('d-none');
-            });
-             // Veritabanı tablosunu da gizle
-            const dbSec = document.getElementById('database-section');
-            if (dbSec) dbSec.classList.add('d-none');
-            
-            // Eğer aktif bir Firestore listener varsa, onu durdur
-            if (unsubscribeDocuments) {
-                unsubscribeDocuments();
-                unsubscribeDocuments = null;
-                console.log("Firestore listener durduruldu.");
-            }
-        }
-
-        function showHome() {
-            hideAllSections();
-            document.getElementById('home-section').classList.remove('d-none');
-            document.getElementById('features-section').classList.remove('d-none');
-        }
-
-        function showVerification() {
-            hideAllSections();
-            document.getElementById('verification-section').classList.remove('d-none');
-            resetVerificationForm();
-        }
-
-        function showAdminLogin() {
-            hideAllSections();
-            document.getElementById('admin-login-section').classList.remove('d-none');
-            const loginError = document.getElementById('login-error');
-            if (loginError) loginError.classList.add('d-none');
-        }
-
-        function showAdminPanel() {
-            hideAllSections();
-            document.getElementById('admin-panel-section').classList.remove('d-none');
-        }
-        
-        function showContact() {
-            hideAllSections();
-            document.getElementById('contact-section').classList.remove('d-none');
-        }
-
-        function resetVerificationForm() {
-            const numInput = document.getElementById('document-number');
-            const dateInput = document.getElementById('document-date');
-            const resultContainer = document.getElementById('result-container');
-            if (numInput) numInput.value = '';
-            if (dateInput) dateInput.value = '';
-            if (resultContainer) resultContainer.classList.add('d-none');
-        }
-
-        // Belge Doğrulama (Firestore ile)
         async function verifyDocument() {
             const docNumber = document.getElementById('document-number').value.trim();
             const docDate = document.getElementById('document-date').value.trim();
             const resultContainer = document.getElementById('result-container');
             const resultElement = document.getElementById('verification-result');
 
-            if (!resultContainer || !resultElement) return;
-
-            resultContainer.classList.remove('success-result', 'error-result', 'd-none');
-
             if (!docNumber || !docDate) {
-                resultContainer.classList.add('error-result');
-                resultElement.innerHTML = `
-                    <h4 class="text-danger fw-bold"><i class="fas fa-exclamation-circle me-2"></i>Eksik Bilgi!</h4>
-                    <p>Lütfen belge numarası ve tarih bilgilerini eksiksiz giriniz.</p>`;
+                showResult(false, 'Lütfen belge numarası ve tarih alanlarını eksiksiz doldurun.');
                 return;
             }
-            
+
             showSpinner(true);
+            resultContainer.classList.add('d-none');
+
             try {
                 const q = query(documentsCollectionRef, 
                                 where("belgeNo", "==", docNumber), 
@@ -779,323 +201,49 @@
                 const querySnapshot = await getDocs(q);
 
                 if (!querySnapshot.empty) {
-                    const docData = querySnapshot.docs[0].data(); // İlk eşleşen belgeyi al
+                    const docData = querySnapshot.docs[0].data();
                     if (docData.gecerli) {
-                        resultContainer.classList.add('success-result');
-                        resultElement.innerHTML = `
-                            <div class="text-success mb-2"><i class="fas fa-check-circle fa-3x"></i></div>
+                        showResult(true, `
                             <h4 class="text-success fw-bold">BELGE DOĞRULANDI</h4>
-                            <p><strong>Belge No:</strong> ${docData.belgeNo}</p>
-                            <p><strong>Tarih:</strong> ${docData.belgeTarihi}</p>
-                            <p><strong>Adı Soyadı:</strong> ${docData.adSoyad}</p>
-                            <p class="mt-2">Bu belge sistemimizde kayıtlıdır ve geçerlidir.</p>`;
+                            <p class="mb-1"><strong>Belge No:</strong> ${docData.belgeNo}</p>
+                            <p class="mb-1"><strong>Tarih:</strong> ${docData.belgeTarihi}</p>
+                            <p class="mb-1"><strong>Adı Soyadı:</strong> ${docData.adSoyad}</p>
+                            <p class="mt-2 small">Bu belge sistemimizde kayıtlıdır ve geçerlidir.</p>
+                        `);
                     } else {
-                        resultContainer.classList.add('error-result');
-                        resultElement.innerHTML = `
-                            <div class="text-warning mb-2"><i class="fas fa-exclamation-triangle fa-3x"></i></div>
-                            <h4 class="text-warning fw-bold">BELGE GEÇERSİZ</h4>
-                            <p><strong>Belge No:</strong> ${docData.belgeNo}</p>
-                            <p><strong>Tarih:</strong> ${docData.belgeTarihi}</p>
-                            <p class="mt-2">Bu belge sistemimizde kayıtlı ancak <strong>geçerli değil</strong>.</p>`;
+                         showResult(false, `
+                            <h4 class="text-danger fw-bold">BELGE GEÇERSİZ</h4>
+                            <p class="mb-1"><strong>Belge No:</strong> ${docData.belgeNo}</p>
+                            <p class="mb-1"><strong>Tarih:</strong> ${docData.belgeTarihi}</p>
+                            <p class="mt-2 small">Bu belge sistemimizde kayıtlıdır ancak <strong>geçerli DEĞİLDİR</strong>.</p>
+                        `);
                     }
                 } else {
-                    resultContainer.classList.add('error-result');
-                    resultElement.innerHTML = `
-                        <div class="text-danger mb-2"><i class="fas fa-times-circle fa-3x"></i></div>
+                    showResult(false, `
                         <h4 class="text-danger fw-bold">BELGE BULUNAMADI</h4>
-                        <p><strong>Girilen Bilgiler:</strong> Belge No: ${docNumber}, Tarih: ${docDate}</p>
-                        <p class="mt-2">Lütfen bilgilerinizi kontrol edip tekrar deneyiniz.</p>`;
+                        <p class="mt-2 small">Girilen bilgilere uyan bir kayıt bulunamadı. Lütfen bilgilerinizi kontrol edip tekrar deneyiniz.</p>
+                    `);
                 }
             } catch (error) {
-                console.error("Belge doğrulama hatası:", error);
-                resultContainer.classList.add('error-result');
-                resultElement.innerHTML = `
-                    <div class="text-danger mb-2"><i class="fas fa-exclamation-triangle fa-3x"></i></div>
-                    <h4 class="text-danger fw-bold">SİSTEM HATASI</h4>
-                    <p>Belge doğrulanırken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.</p>`;
-                showModal(`Doğrulama sırasında hata: ${error.message}`, 'error');
+                console.error("Verification error:", error);
+                showResult(false, 'Sistemsel bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
             } finally {
                 showSpinner(false);
             }
         }
-
-        // Yönetici Girişi
-        function loginAdmin() {
-            const username = document.getElementById('admin-username').value.trim();
-            const password = document.getElementById('admin-password').value.trim();
-            const errorElement = document.getElementById('login-error');
-
-            if (!errorElement) return;
-
-            // Not: Bu hala güvenli bir yöntem DEĞİLDİR. Gerçek bir uygulamada Firebase Auth kullanılmalıdır.
-            if (username === "tkmstamb" && password === "turstm1!stamtkm852496+") {
-                showAdminPanel();
-                errorElement.classList.add('d-none');
-            } else {
-                errorElement.textContent = "Geçersiz kullanıcı adı veya parola!";
-                errorElement.classList.remove('d-none');
-            }
-        }
-
-        function logoutAdmin() {
-            document.getElementById('admin-username').value = '';
-            document.getElementById('admin-password').value = '';
-            showAdminLogin();
-        }
         
-        async function loadDocumentsToTable() {
-            const tableBody = document.getElementById('database-table-body');
-            const noDataMsg = document.getElementById('no-data-message');
-            if (!tableBody || !noDataMsg) return;
-
-            showSpinner(true);
-            tableBody.innerHTML = ''; // Tabloyu temizle
-            noDataMsg.classList.add('d-none');
-
-            // Eğer zaten bir listener varsa, eskisini durdur.
-            if (unsubscribeDocuments) {
-                unsubscribeDocuments();
-                console.log("Önceki Firestore listener durduruldu.");
-            }
-
-            // Yeni onSnapshot listener'ı ayarla
-            unsubscribeDocuments = onSnapshot(documentsCollectionRef, (querySnapshot) => {
-                console.log("Firestore'dan veriler güncellendi.");
-                tableBody.innerHTML = ''; // Her güncellemede tabloyu temizle
-                if (querySnapshot.empty) {
-                    noDataMsg.classList.remove('d-none');
-                } else {
-                    noDataMsg.classList.add('d-none');
-                    querySnapshot.forEach(docSnap => {
-                        const docData = docSnap.data();
-                        const row = tableBody.insertRow();
-                        row.innerHTML = `
-                            <td>${docData.belgeNo || 'N/A'}</td>
-                            <td>${docData.belgeTarihi || 'N/A'}</td>
-                            <td>${docData.adSoyad || 'N/A'}</td>
-                            <td>
-                                <span class="badge ${docData.gecerli ? 'bg-success' : 'bg-danger'}">
-                                    ${docData.gecerli ? 'Geçerli' : 'Geçersiz'}
-                                </span>
-                            </td>
-                            <td>
-                                <button class="btn btn-danger btn-sm" onclick="deleteSingleRecord('${docSnap.id}')">
-                                    <i class="fas fa-trash-alt"></i> Sil
-                                </button>
-                            </td>
-                        `;
-                    });
-                }
-                showSpinner(false);
-            }, (error) => {
-                console.error("Firestore'dan veri alınırken hata:", error);
-                showModal(`Veritabanı okunurken hata: ${error.message}`, 'error');
-                noDataMsg.textContent = 'Veriler yüklenirken bir hata oluştu.';
-                noDataMsg.classList.remove('d-none');
-                showSpinner(false);
-            });
-            console.log("Yeni Firestore listener ayarlandı.");
-        }
-
-
-        // Admin Panel: Veritabanı Görüntüle
-        async function showDatabaseTable() {
-             const dbSection = document.getElementById('database-section');
-            if (!dbSection) return;
-            dbSection.classList.remove('d-none');
-            await loadDocumentsToTable(); // Verileri yükle ve listener'ı başlat
-        }
-
-
-        // Excel'den içe aktarma (SheetJS ile Firestore'a)
-        function handleExcelImport(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        function showResult(isSuccess, message) {
+            const resultContainer = document.getElementById('result-container');
+            const resultElement = document.getElementById('verification-result');
             
-            showSpinner(true);
-            const reader = new FileReader();
-            reader.onload = async function(evt) {
-                try {
-                    const data = new Uint8Array(evt.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-                    
-                    let addedCount = 0;
-                    const batch = writeBatch(db);
-
-                    for (const rowObj of jsonData) {
-                        // Sütun isimlerini küçük harfe çevirip boşlukları kaldırarak eşleştirme
-                        const normalizedRow = {};
-                        for (const key in rowObj) {
-                            normalizedRow[key.toLowerCase().replace(/\s+/g, '')] = rowObj[key];
-                        }
-
-                        // 'belgeno', 'belgetarihi', 'adsoyad', 'gecerli' alanlarını ara
-                        const belgeNo = normalizedRow.belgeno || normalizedRow.id; // 'id' de kabul edilebilir
-                        const belgeTarihi = normalizedRow.belgetarihi || normalizedRow.tarih; // 'tarih' de kabul edilebilir
-                        const adSoyad = normalizedRow.adsoyad || normalizedRow.name; // 'name' de kabul edilebilir
-                        let gecerli = normalizedRow.gecerli || normalizedRow.valid; // 'valid' de kabul edilebilir
-
-                        if (belgeNo && belgeTarihi && adSoyad && typeof gecerli !== 'undefined') {
-                             // gecerli değerini boolean yap
-                            if (typeof gecerli === 'string') {
-                                gecerli = gecerli.toLowerCase() === 'true' || gecerli === '1' || gecerli.toLowerCase() === 'evet';
-                            } else if (typeof gecerli === 'number') {
-                                gecerli = gecerli === 1;
-                            } else {
-                                gecerli = Boolean(gecerli);
-                            }
-
-                            // Firestore'a eklenecek yeni belge için referans oluştur
-                            const newDocRef = doc(documentsCollectionRef); // Otomatik ID ile
-                            batch.set(newDocRef, {
-                                belgeNo: String(belgeNo).trim(),
-                                belgeTarihi: String(belgeTarihi).trim(),
-                                adSoyad: String(adSoyad).trim(),
-                                gecerli: gecerli // boolean
-                            });
-                            addedCount++;
-                        } else {
-                            console.warn("Excel'den eksik satır:", rowObj);
-                        }
-                    }
-
-                    if (addedCount > 0) {
-                        await batch.commit();
-                        showModal(`${addedCount} yeni kayıt başarıyla Firestore'a aktarıldı!`, 'success');
-                        if (!document.getElementById('database-section').classList.contains('d-none')) {
-                           // Tablo zaten açıksa yeniden yüklemeye gerek yok, onSnapshot halleder.
-                        }
-                    } else {
-                        showModal("Excel dosyasından aktarmaya uygun yeni veri bulunamadı.", 'info');
-                    }
-                } catch (error) {
-                    console.error("Excel içe aktarma hatası:", error);
-                    showModal(`Excel dosyası işlenirken hata: ${error.message}`, 'error');
-                } finally {
-                    showSpinner(false);
-                    event.target.value = null; // Aynı dosyayı tekrar seçebilmek için inputu sıfırla
-                }
-            };
-            reader.onerror = function(err) {
-                console.error("Dosya okuma hatası:", err);
-                showModal("Excel dosyası okunurken hata oluştu.", 'error');
-                showSpinner(false);
-                event.target.value = null;
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-
-        // CSV şeklinde dışa aktarma (Firestore'dan)
-        async function exportDatabase() {
-            showSpinner(true);
-            try {
-                const querySnapshot = await getDocs(documentsCollectionRef);
-                if (querySnapshot.empty) {
-                    showModal("Dışa aktarılacak veri bulunamadı.", 'info');
-                    return;
-                }
-
-                const headers = ['belgeNo', 'belgeTarihi', 'adSoyad', 'gecerli'];
-                let csvContent = headers.join(',') + '\n';
+            resultContainer.classList.remove('d-none', 'success-result', 'error-result');
+            resultContainer.classList.add(isSuccess ? 'success-result' : 'error-result');
+            
+            const icon = isSuccess 
+                ? '<div class="text-success mb-2"><i class="fas fa-check-circle fa-3x"></i></div>'
+                : '<div class="text-danger mb-2"><i class="fas fa-times-circle fa-3x"></i></div>';
                 
-                querySnapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const row = headers.map(header => {
-                        // String olmayan değerleri (örn. boolean) stringe çevir
-                        let value = data[header];
-                        if (typeof value === 'boolean') {
-                            value = value.toString();
-                        } else if (typeof value === 'number') {
-                             value = value.toString();
-                        } else if (value === null || typeof value === 'undefined') {
-                            value = ""; // Boş string olarak ayarla
-                        }
-                        // Virgül içeren değerleri çift tırnak içine al
-                        return `"${String(value || "").replace(/"/g, '""')}"`;
-                    });
-                    csvContent += row.join(',') + '\n';
-                });
-
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.setAttribute("href", url);
-                link.setAttribute("download", `belgeler_${new Date().toISOString().slice(0,10)}.csv`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                showModal("Veritabanı başarıyla CSV olarak dışa aktarıldı.", 'success');
-            } catch (error) {
-                console.error("Dışa aktarma hatası:", error);
-                showModal(`Veriler dışa aktarılırken hata: ${error.message}`, 'error');
-            } finally {
-                showSpinner(false);
-            }
-        }
-
-        // Belirli bir kaydı silmek için modalı göster
-        function promptDeleteRecord() {
-            // Bu fonksiyon artık doğrudan silme yapmıyor, tablo üzerinden silme yapılacak.
-            // Eğer genel bir "belge no ve tarih ile sil" özelliği isteniyorsa,
-            // bunun için ayrı bir arayüz elemanı (inputlar ve buton) eklenmeli.
-            // Şimdilik, tablodan silme fonksiyonu (deleteSingleRecord) yeterli.
-             showModal(
-                `Silmek istediğiniz kaydın Belge Numarası ve Tarihini girerek silme işlemi yapabilirsiniz. 
-                 Bu özellik için özel bir arayüz (input alanları) eklenebilir. 
-                 Şu anda kayıtları tablodaki 'Sil' butonu ile silebilirsiniz.`, 
-                'info'
-            );
-        }
-        
-        // Tablodaki sil butonu için
-        async function deleteSingleRecord(docId) {
-             showModal(`"${docId}" ID'li kaydı silmek istediğinizden emin misiniz?`, 'warning', true, async () => {
-                showSpinner(true);
-                try {
-                    const docRef = doc(db, documentsCollectionPath, docId);
-                    await deleteDoc(docRef);
-                    showModal(`Kayıt (ID: ${docId}) başarıyla silindi.`, 'success');
-                    // onSnapshot sayesinde tablo otomatik güncellenecektir.
-                } catch (error) {
-                    console.error("Kayıt silme hatası:", error);
-                    showModal(`Kayıt silinirken hata: ${error.message}`, 'error');
-                } finally {
-                    showSpinner(false);
-                }
-            });
-        }
-
-
-        // Tüm verileri temizleme (Firestore'dan)
-        async function clearAllData() {
-            showModal("TÜM KAYITLARI silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!", 'warning', true, async () => {
-                showSpinner(true);
-                try {
-                    const querySnapshot = await getDocs(documentsCollectionRef);
-                    if (querySnapshot.empty) {
-                        showModal("Silinecek kayıt bulunamadı.", 'info');
-                        showSpinner(false);
-                        return;
-                    }
-                    const batch = writeBatch(db);
-                    querySnapshot.forEach(docSnap => {
-                        batch.delete(docSnap.ref);
-                    });
-                    await batch.commit();
-                    showModal("Tüm veriler başarıyla Firestore'dan temizlendi.", 'success');
-                     // onSnapshot sayesinde tablo otomatik güncellenecektir (boş hale gelecektir).
-                } catch (error) {
-                    console.error("Tüm verileri temizleme hatası:", error);
-                    showModal(`Veriler temizlenirken hata: ${error.message}`, 'error');
-                } finally {
-                    showSpinner(false);
-                }
-            });
+            resultElement.innerHTML = icon + message;
         }
 
     </script>
