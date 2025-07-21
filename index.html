@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Türkmenistan Başkonsolosluğu Belge Doğrulama</title>
+    <title>Türkmenistan Belge Doğrulama</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -98,7 +98,7 @@
             box-shadow: 0 0 0 0.25rem rgba(0, 122, 83, 0.2);
         }
         
-       .date-input-wrapper {
+        .date-input-wrapper {
             position: relative;
         }
         
@@ -277,12 +277,25 @@
         function showSpinner(show) { document.getElementById('spinner-container').style.display = show ? 'flex' : 'none'; }
         
         const translations = {
+            tk: {
+                headerTitle: "Resminama Tassyklama Ulgamy", headerSubtitle: "Türkmenistanyň edaralary tarapyndan berlen resminamalaryň dogrulygyny barlamak.",
+                formTitle: "Resminama Gözleg", formSubtitle: "Tassyklamak isleýän resminamaňyzyň maglumatlaryny giriziň.",
+                docNumberLabel: "Resminama Nomeri", docNumberPlaceholder: "Mysal: 12345",
+                docDateLabel: "Resminama Senesi", docDatePlaceholder: "GG.AA.ÝÝÝÝ", docDateExample: "Mysal: 15.07.2023",
+                searchButton: "Gözle", footerText: "&copy; 2025 Türkmenistan. Ähli hukuklar goralan.",
+                loadingText: "Ýüklenýär...", authFailed: "Awtorizasiýa şowsuz boldy. Sahypany täzeläň.",
+                fillAllFields: "Resminama belgisini ve sene meýdanlaryny doly dolduryň.", systemError: "Ulgamda näsazlyk ýüze çykdy. Soňrak synanyşyň.",
+                docValidated: "RESMINAMA TASSYKLANDY", docInvalid: "RESMINAMA YNAMSYZ", docNotFound: "RESMINAMA TAPYLMADY",
+                docRegisteredValid: "Bu resminama ulgamymyzda hasaba alyndy ve dogrudyr.", docRegisteredInvalid: "Bu resminama ulgamymyzda bellige alyndy, ýöne <strong>ygtybarly däl</strong>.",
+                docNotFoundMessage: "Girizilen maglumatlara laýyk ýazgy tapylmady. Maglumatlaryňyzy barlaň ve gaýtadan synanyşyň.",
+                docNo: "Resminama No:", date: "Sene:", fullName: "Ady, Familiýasy:"
+            },
             tr: {
-                headerTitle: "Belge Doğrulama Sistemi", headerSubtitle: "Türkmenistan Başkonsolosluğu tarafından verilen belgelerin geçerliliğini sorgulayın.",
+                headerTitle: "Belge Doğrulama Sistemi", headerSubtitle: "Türkmenistan makamları tarafından verilen belgelerin geçerliliğini sorgulayın.",
                 formTitle: "Belge Sorgulama", formSubtitle: "Lütfen doğrulamak istediğiniz belgenin bilgilerini giriniz.",
                 docNumberLabel: "Belge Numarası", docNumberPlaceholder: "Örn: 12345",
                 docDateLabel: "Belge Tarihi", docDatePlaceholder: "GG.AA.YYYY", docDateExample: "Örnek: 15.07.2023",
-                searchButton: "Sorgula", footerText: "&copy; 2025 Türkmenistan Başkonsolosluğu. Tüm hakları saklıdır.",
+                searchButton: "Sorgula", footerText: "&copy; 2025 Türkmenistan. Tüm hakları saklıdır.",
                 loadingText: "Yükleniyor...", authFailed: "Kimlik doğrulama başarısız oldu. Lütfen sayfayı yenileyin.",
                 fillAllFields: "Lütfen belge numarası ve tarih alanlarını eksiksiz doldurun.", systemError: "Sistemsel bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
                 docValidated: "BELGE DOĞRULANDI", docInvalid: "BELGE GEÇERSİZ", docNotFound: "BELGE BULUNAMADI",
@@ -290,44 +303,31 @@
                 docNotFoundMessage: "Girilen bilgilere uyan bir kayıt bulunamadı. Lütfen bilgilerinizi kontrol edip tekrar deneyiniz.",
                 docNo: "Belge No:", date: "Tarih:", fullName: "Adı Soyadı:"
             },
-            tk: {
-                headerTitle: "Resminama Tassyklama Ulgamy", headerSubtitle: "Türkmenistanyň Baş Konsullygy tarapyndan berlen resminamalaryň dogrulygyny barlamak.",
-                formTitle: "Resminama Gözleg", formSubtitle: "Tassyklamak isleýän resminamaňyzyň maglumatlaryny giriziň.",
-                docNumberLabel: "Resminama Nomeri", docNumberPlaceholder: "Mysal: 12345",
-                docDateLabel: "Resminama Senesi", docDatePlaceholder: "GG.AA.ÝÝÝÝ", docDateExample: "Mysal: 15.07.2023",
-                searchButton: "Gözle", footerText: "&copy; 2025 Türkmenistanyň Baş Konsullygy. Ähli hukuklar goralan.",
-                loadingText: "Ýüklenýär...", authFailed: "Awtorizasiýa şowsuz boldy. Sahypany täzeläň.",
-                fillAllFields: "Resminama belgisini ve sene meýdanlaryny doly dolduryň.", systemError: "Ulgamda näsazlyk ýüze çykdy. Soňrak synanyşyň.",
-                docValidated: "RESMINAMA TASSYKLANDY", docInvalid: "RESMINAMA YNAMSYZ", docNotFound: "RESMINAMA TAPYLMADY",
-                docRegisteredValid: "Bu resminama ulgamymyzda hasaba alyndy ve dogrudyr.", docRegisteredInvalid: "Bu resminama ulgamymyzda bellige alyndy, ýöne <strong>ygtybarly däl</strong>.",
-                docNotFoundMessage: "Girizilen maglumatlara laýyk ýazgy tapylmady. Maglumatlaryňyzy barlaň ve gaýtadan synanyşyň.",
-                docNo: "Resminama No:", date: "Sene:", fullName: "Ady Familiýasy:"
-            },
             en: {
-                headerTitle: "Document Verification System", headerSubtitle: "Verify the validity of documents issued by the Consulate General of Turkmenistan.",
+                headerTitle: "Document Verification System", headerSubtitle: "Verify the validity of documents issued by the authorities of Turkmenistan.",
                 formTitle: "Document Inquiry", formSubtitle: "Please enter the document information you wish to verify.",
                 docNumberLabel: "Document Number", docNumberPlaceholder: "Ex: 12345",
                 docDateLabel: "Document Date", docDatePlaceholder: "DD.MM.YYYY", docDateExample: "Example: 15.07.2023",
-                searchButton: "Search", footerText: "&copy; 2025 Consulate General of Turkmenistan. All rights reserved.",
+                searchButton: "Search", footerText: "&copy; 2025 Turkmenistan. All rights reserved.",
                 loadingText: "Loading...", authFailed: "Authentication failed. Please refresh the page.",
                 fillAllFields: "Please fill in the document number and date fields completely.", systemError: "A system error occurred. Please try again later.",
                 docValidated: "DOCUMENT VALIDATED", docInvalid: "DOCUMENT INVALID", docNotFound: "DOCUMENT NOT FOUND",
                 docRegisteredValid: "This document is registered in our system and is valid.", docRegisteredInvalid: "This document is registered in our system but is <strong>NOT valid</strong>.",
                 docNotFoundMessage: "No record found matching the information entered. Please check your information and try again.",
-                docNo: "Doc No:", date: "Date:", fullName: "Name Surname:"
+                docNo: "Doc No:", date: "Date:", fullName: "Full Name:"
             },
             ru: {
-                headerTitle: "Система проверки документов", headerSubtitle: "Проверьте подлинность документов, выданных Генеральное Kонсульство Туркменистана.",
+                headerTitle: "Система проверки документов", headerSubtitle: "Проверьте подлинность документов, выданных властями Туркменистана.",
                 formTitle: "Запрос документа", formSubtitle: "Пожалуйста, введите информацию о документе, который вы хотите проверить.",
                 docNumberLabel: "Номер документа", docNumberPlaceholder: "Пример: 12345",
                 docDateLabel: "Дата документа", docDatePlaceholder: "ДД.ММ.ГГГГ", docDateExample: "Пример: 15.07.2023",
-                searchButton: "Найти", footerText: "&copy; 2025 Генеральное Kонсульство Туркменистана. Все права защищены.",
+                searchButton: "Найти", footerText: "&copy; 2025 Туркменистан. Все права защищены.",
                 loadingText: "Загрузка...", authFailed: "Ошибка аутентификации. Пожалуйста, обновите страницу.",
                 fillAllFields: "Пожалуйста, полностью заполните поля номера документа и даты.", systemError: "Произошла системная ошибка. Пожалуйста, повторите попытку позже.",
                 docValidated: "ДОКУМЕНТ ПОДТВЕРЖДЕН", docInvalid: "ДОКУМЕНТ НЕДЕЙСТВИТЕЛЕН", docNotFound: "ДОКУМЕНТ НЕ НАЙДЕН",
                 docRegisteredValid: "Этот документ зарегистрирован в нашей системе и действителен.", docRegisteredInvalid: "Этот документ зарегистрирован в нашей системе, но <strong>НЕДЕЙСТВИТЕЛЕН</strong>.",
                 docNotFoundMessage: "Запись, соответствующая введенной информации, не найдена. Пожалуйста, проверьте информацию и повторите попытку.",
-                docNo: "№ док:", date: "Дата:", fullName: "Имя Фамилия:"
+                docNo: "№ док:", date: "Дата:", fullName: "ФИО:"
             }
         };
 
@@ -350,7 +350,7 @@
             datePickerInstance = flatpickr(dateInput, config);
         }
         
-        let currentLang = localStorage.getItem('selectedLang') || 'tr';
+        let currentLang = localStorage.getItem('selectedLang') || 'tk';
 
         function setLanguage(lang) {
             currentLang = lang;
@@ -387,18 +387,11 @@
             onAuthStateChanged(auth, async (user) => {
                 if (!user) {
                     try {
-                        if (initialAuthToken) {
-                            try {
-                                await signInWithCustomToken(auth, initialAuthToken);
-                            } catch (customTokenError) {
-                                console.warn("Custom token sign-in failed, attempting anonymous sign-in:", customTokenError);
-                                await signInAnonymously(auth); // Fallback to anonymous if custom token fails
-                            }
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                    } catch (authError) {
-                        console.error("Authentication Error:", authError);
+                        if (initialAuthToken) await signInWithCustomToken(auth, initialAuthToken);
+                        else await signInAnonymously(auth);
+                    } catch (error) {
+                        console.error("Authentication Error:", error);
+                        // Using a custom modal instead of alert for better UX
                         showResult(false, `<h4 class="fw-bold">${translations[currentLang].authFailed}</h4>`); 
                     }
                 }
@@ -455,8 +448,7 @@
                     `);
                 }
             } catch (error) {
-                // Hatanın tam detaylarını konsola yazdır
-                console.error("Verification error:", error); 
+                console.error("Verification error:", error);
                 showResult(false, `<h4 class="fw-bold">${translations[currentLang].systemError}</h4>`);
             } finally {
                 showSpinner(false);
